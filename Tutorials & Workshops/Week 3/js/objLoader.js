@@ -1,56 +1,42 @@
-/**
- * Created by mvandeberg on 1/08/2015.
- */
+var gl;
 
+function render(size) {
+    //Clear canvas.
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    //Draw
+    gl.drawArrays(gl.TRIANGLES, 0, size);
+}
 
 function init(object) {
-
-    canvas = document.getElementById( "gl-canvas" );
-
-    gl = WebGLUtils.setupWebGL( canvas );
-    if ( !gl ) { alert( "WebGL isn't available" ); }
-
-    canvas.addEventListener("click", function(){
-        gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-        var t = vec2(2*event.clientX/canvas.width-1,
-            2*(canvas.height-event.clientY)/canvas.height-1);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 8*index, flatten(t));
-
-        gl.bindBuffer(gl.ARRAY_BUFFER, cBuffer);
-        t = vec4(colors[(index)%7]);
-        gl.bufferSubData(gl.ARRAY_BUFFER, 16*index, flatten(t));
-        index++;
-    } );
-
-    gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.5, 0.5, 0.5, 1.0 );
-
-    //
-    //  Load shaders and initialize attribute buffers
-    //
+    //Bind and set up Canvas.
+    var canvas = document.getElementById('canvas');
+    gl = canvas.getContext('webgl');
+    gl.viewport(0,0,canvas.width,canvas.height);
+    gl.clearColor(0.2, 0.2, 0.2, 0.3);
+    //Init Webgl with shaders
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
-    gl.useProgram( program );
+    gl.useProgram(program);
 
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData( gl.ARRAY_BUFFER, 8*maxNumVertices, gl.STATIC_DRAW );
+    //Create a WebGl buffer
+    var vertexBuffer = gl.createBuffer();
+    //Bind buffer to the created variable
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    //Fill buffer with data
+    gl.bufferData(gl.ARRAY_BUFFER, object.vertices, gl.STATIC_DRAW);
 
-    var vPosition = gl.getAttribLocation(program, "vPosition");
-    gl.vertexAttribPointer(vPosition, 2, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(vPosition);
-
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, 16*maxNumVertices, gl.STATIC_DRAW );
-
-    var vColor = gl.getAttribLocation( program, "vColor" );
-    gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vColor );
-
-    render();
+    //Bind position from variable in HTML to Webgl.
+    program.positionAttribute = gl.getAttribLocation(program, 'pos');
+    gl.enableVertexAttribArray(program.positionAttribute);
+    //Set position to variable.
+    gl.vertexAttribPointer(
+        program.positionAttribute, 3, gl.FLOAT, gl.FALSE,
+        Float32Array.BYTES_PER_ELEMENT * 6, 0);
+    //Render
+    render(object.vertexCount);
 
 }
 
+/********      Provided code       ********/
 function loadMeshData(string) {
     var lines = string.split("\n");
     var positions = [];
@@ -113,20 +99,10 @@ function loadMesh(filename) {
     }).done(function(data) {
         init(loadMeshData(data));
     }).fail(function() {
-        alert('Faild to retrieve [' + filename + "]");
+        alert('Failed to retrieve [' + filename + "]");
     });
 }
 
-function render() {
-
-    gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays( gl.POINTS, 0, index );
-
-    window.requestAnimFrame(render);
-
-}
-
 $(document).ready(function() {
-    loadMesh('http://localhost:8000/cone')
-  //  loadMesh('http://localhost:8000/monkey')
+    loadMesh('js/monkey.obj')
 });
