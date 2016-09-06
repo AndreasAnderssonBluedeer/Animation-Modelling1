@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Object Loader</title>
+
+    <script type="x-shader/x-vertex" id="vertex-shader">
+    attribute vec3 pos;
+    uniform vec3 theta;
+    uniform float translation;
+
+    void main() {
+
+    vec3 angles = radians( theta );
+    vec3 c = cos( angles );
+    vec3 s = sin( angles );
+
+     //Rotation Matrix for Y.
+		    mat4 rotateY = mat4(
+		    c.y, 0.0, -s.y, 0.0,
+		    0.0, 1.0,  0.0, 0.0,
+		    s.y, 0.0,  c.y, 0.0,
+		    0.0, 0.0,  0.0, 1.0 );
+
+    //Translation matrix (Only for x)
+    mat4 translationMatrix = mat4(
+            1.0,  0.0, 0.0, translation,
+		    0.0,  1.0, 0.0, 0.0,
+		    0.0,  0.0, 1.0, 0.0,
+		    0.0,  0.0, 0.0, 1.0 );
+
+      // Multiplication order-> Rotate, Position, Translation
+      gl_Position =  rotateY * vec4(pos, 1.0) * translationMatrix;
+      //1.5 = zoom value, gl_position= position
+    }
+    </script>
+    <script type="x-shader/x-fragment" id="fragment-shader">
+    void main() {
+      gl_FragColor = vec4(0.5,0.0,0.0, 1.0);    //Drawing color
+    }
+    </script>
+    <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../Common/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="../Common/gl-matrix.js"></script>
+    <script type="text/javascript" src="../Common/InitShaders.js"></script>
+
+    <script type="text/javascript" src="ObjectLoader.js"></script>
+</head>
+<body>
+<canvas id="canvas" height="500" width="500"></canvas>
+
+</body>
+</html>
