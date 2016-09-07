@@ -17,7 +17,6 @@ var translationLoc2;
 var translation2=0.0;
 var leftToRight2=false;
 var color2=[0, 0, 0.5, 1];
-// var size2;
 
 var vColor;
 
@@ -64,14 +63,14 @@ function calculations() {
     theta1[1] += 1.0;
     
     //Translation
-    if (leftToRight1 && translation1 <0.6){
+    if (leftToRight1 && translation1 <0.4){
         translation1+=0.007;
     }
     else if (leftToRight1){
         leftToRight1=false;
     }
 
-    if (!leftToRight1 && translation1 > -0.6){
+    if (!leftToRight1 && translation1 > -0.4){
         translation1-=0.007;
     }
     else if(!leftToRight1){
