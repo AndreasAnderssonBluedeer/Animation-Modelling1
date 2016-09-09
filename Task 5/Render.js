@@ -21,6 +21,8 @@ function render(booli) {
     renderCube3();
     renderCube4();
 
+    rotate();
+
     if (loop){
     translate();
         requestAnimFrame(render);
@@ -32,7 +34,6 @@ function render(booli) {
 function renderObj1() {
     //Update variables
     if(loop) {
-        thetas[0][1] += 1.0;
         var colorUpdate = translations[0][0] + 0.4;
         modelColors[0] = [0.5, colorUpdate, 0, 1];
     }
@@ -45,7 +46,6 @@ function renderObj1() {
 function renderObj2(){
     //Update variables
     if(loop) {
-        thetas[1][1] += 5.0;
         var colorUpdate = translations[1][0]  + 0.4;
         modelColors[1] = [0, 0.5, colorUpdate, 1];
     }
@@ -57,7 +57,6 @@ function renderObj2(){
 }
 
 function renderCube1(){
-    thetas[2][1] += 5.0;
     setDrawColor(modelColors[2]);
     setUniforms(thetaLocs[2],thetas[2],translationLocs[2],translations[2]);
         bufferAndPointerCube();
@@ -65,7 +64,6 @@ function renderCube1(){
 
 }
 function renderCube2(){
-    thetas[3][1] += -5.0;
     setDrawColor(modelColors[3]);
     setUniforms(thetaLocs[3],thetas[3],translationLocs[3],translations[3]);
         bufferAndPointerCube();
@@ -73,7 +71,6 @@ function renderCube2(){
 
 }
 function renderCube3(){
-    thetas[4][1] += 2.0;
     setDrawColor(modelColors[4]);
     setUniforms(thetaLocs[4],thetas[4],translationLocs[4],translations[4]);
         bufferAndPointerCube();
@@ -81,7 +78,6 @@ function renderCube3(){
 
 }
 function renderCube4() {
-    thetas[5][1] += -2.0;
     setDrawColor(modelColors[5]);
     setUniforms(thetaLocs[5], thetas[5], translationLocs[5], translations[5]);
     bufferAndPointerCube();
@@ -156,5 +152,12 @@ function translate() {
         else if (!leftRight[a]){
             leftRight[a]=true;
         }
+    }
+}
+function rotate() {
+    for(var y=0;y<updateRotation.length;y++){
+        thetas[y][0]+=updateRotation[y][0];
+        thetas[y][1]+=updateRotation[y][1];
+        thetas[y][2]+=updateRotation[y][2];
     }
 }

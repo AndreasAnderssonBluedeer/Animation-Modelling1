@@ -1,11 +1,13 @@
 //Change translate speed.
 $(document).keydown(function(event){
     if(modelSelected) {
+        //Speed up Translate
         if ("W" == String.fromCharCode(event.which)) {
             if (updateTrans[match] < 0.1) {
                 updateTrans[match] += 0.004;
             }
         }
+        //Slow down Translate
         if ("S" == String.fromCharCode(event.which)) {
             if (updateTrans[match] >= 0.0041) {
                 updateTrans[match] -= 0.004;
@@ -13,7 +15,33 @@ $(document).keydown(function(event){
                 updateTrans[match] = 0;
             }
         }
-        $("#Translate").text("Object" + match + " Translate-Speed:" + updateTrans[match]);
+        //Speed up rotation X-Axis
+        if ("X" == String.fromCharCode(event.which)) {
+            updateRotation[match][0]+=2;
+        }
+       //Slow down rotation
+        if ("Z" == String.fromCharCode(event.which)) {
+            updateRotation[match][0]-=2;
+        }
+
+        //Speed up rotation Y-Axis
+        if ("C" == String.fromCharCode(event.which)) {
+            updateRotation[match][1]+=2;
+        }
+        //Slow down rotation
+        if ("V" == String.fromCharCode(event.which)) {
+            updateRotation[match][1]-=2;
+        }
+
+        //Speed up rotation Z-Axis
+        if ("B" == String.fromCharCode(event.which)) {
+            updateRotation[match][2]+=2;
+        }
+        //Slow down rotation
+        if ("N" == String.fromCharCode(event.which)) {
+            updateRotation[match][2]-=2;
+        }
+        $("#Translate").text("Object" + match + " Translate-Speed:" + updateTrans[match]+ ",Rotation: "+updateRotation[match]);
     }
 });
 

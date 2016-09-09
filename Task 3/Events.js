@@ -65,9 +65,7 @@ function picking(){
     if(!modelSelected){
         $( "#info").text("Background picked!");
     }
-    else{
-        $("#y").slider('value',translations[match][1]);
-    }
+   
 }
 
 

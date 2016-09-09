@@ -3,8 +3,13 @@ var size;
 var program;
 var vColor;
 var frameBuffer;
-var mode=true;
 var colorPick = new Uint8Array(4);
+var texture;
+var tempModelColors=[];
+var canvas;
+var match;
+var modelSelected=false;
+var loop=true;
 
 //Model Arrays
 var modelColors=[];
@@ -12,13 +17,8 @@ var thetas=[];
 var thetaLocs=[];
 var translations=[];
 var translationLocs=[];
-
-//Object 1
-var leftToRight1=true;
-var updateTrans1=0.009;
-//Object 2
-var leftToRight2=false;
-var updateTrans2=0.004;
+var updateTrans=[];
+var leftRight=[];
 
 //Cube
 var points = [];
@@ -26,19 +26,27 @@ var vertexCubeBuffer;
 var vertexBuffer;
 
 
+function main() {
+    canvas = document.getElementById('canvas');
+    $("#y").gmanSlider({slide: updatePosition(), min: -1, max: 1, step: 0.01, precision: 2});
+}
+function updatePosition() {
+    return function (event, ui) {
+        translations[match][1]=ui.value;
+    };
+}
 
 
 function init(object) {
     //Bind and set up Canvas.
-    var canvas = document.getElementById('canvas');
     gl = canvas.getContext('webgl');
-    gl.viewport(0,0,canvas.width,canvas.height);
+    gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.9, 0.9, 0.9, 1.0);
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.CULL_FACE);
 
     //Init Webgl with shaders
-    program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    program = initShaders(gl, "vertex-shader", "fragment-shader");
     gl.useProgram(program);
 
     program.positionAttribute = gl.getAttribLocation(program, 'pos');
@@ -54,9 +62,11 @@ function init(object) {
     initModelArrays();
 
     //Add Event listener that calls our picking function
-    canvas.addEventListener("mousedown", function(){picking();});
+    canvas.addEventListener("mousedown", function () {
+        picking();
+    });
     //Render
-    render(false);
+    render(true);
 }
 
 
@@ -68,16 +78,24 @@ function initModelArrays() {
     modelColors.push([0.5, 0, 0, 1]);
     modelColors.push([0, 1, 1, 1]);
     modelColors.push([1, 0, 1, 1]);
-    //Translations
-    translations.push(0.0);
-    translations.push(0.0);
-    translations.push(0.6);
-    translations.push(-0.6);
-    translations.push(0.2);
-    translations.push(-0.2);
-    
+    //Translations      X   Y   Z
+    translations.push([0.0, 0.0, 0.0]);
+    translations.push([0.0,0.0,0.0]);
+    translations.push([0.6,0.0,0.0]);
+    translations.push([-0.6,0.0,0.0]);
+    translations.push([0.2,0.0,0.0]);
+    translations.push([-0.2,0.0,0.0]);
+    //UpdateTrans
+    updateTrans.push(0.009);
+    updateTrans.push(0.004);
+    updateTrans.push(0.0);
+    updateTrans.push(0.0);
+    updateTrans.push(0.0);
+    updateTrans.push(0.0);
+
     //Thetas and Uniform binding.
     for (var z=0;z<6;z++){
+        leftRight.push(false);
         thetas.push([ 0, 0, 0 ]);
         thetaLocs[z]=gl.getUniformLocation(program, "theta");
         translationLocs[z]= gl.getUniformLocation(program, "translation");
@@ -86,7 +104,7 @@ function initModelArrays() {
 
 function initTextureAndFrameBuffer(){
     //Create Texture for the picking
-    var texture = gl.createTexture();
+    texture = gl.createTexture();
     gl.bindTexture( gl.TEXTURE_2D, texture );
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 512, 512, 0,
@@ -96,7 +114,9 @@ function initTextureAndFrameBuffer(){
     // Allocate a frame buffer object
     frameBuffer = gl.createFramebuffer();
     gl.bindFramebuffer( gl.FRAMEBUFFER, frameBuffer);
+
     gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, texture, 0);
+    gl.bindTexture(gl.TEXTURE_2D, null);
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
 }

@@ -19,12 +19,27 @@ var translations=[];
 var translationLocs=[];
 var updateTrans=[];
 var leftRight=[];
+var updateRotation=[];
 
+//Cube
+var points = [];
+var vertexCubeBuffer;
+var vertexBuffer;
+
+
+function main() {
+    canvas = document.getElementById('canvas');
+    $("#y").gmanSlider({slide: updatePosition(), min: -1, max: 1, step: 0.01, precision: 2});
+}
+function updatePosition() {
+    return function (event, ui) {
+        translations[match][1]=ui.value;
+    };
+}
 
 
 function init(object) {
     //Bind and set up Canvas.
-    canvas = document.getElementById('canvas');
     gl = canvas.getContext('webgl');
     gl.viewport(0, 0, canvas.width, canvas.height);
     gl.clearColor(0.9, 0.9, 0.9, 1.0);
@@ -42,6 +57,7 @@ function init(object) {
     initTextureAndFrameBuffer();
     //Init and bind our models to buffers.
     initObject(object);
+    initCube();
     //Create Model Arrays (Arrays with Theta,Colours,Translation
     //And binds uniforms.
     initModelArrays();
@@ -59,16 +75,36 @@ function initModelArrays() {
     //Colours
     modelColors.push([0.5, 0, 0, 1]);
     modelColors.push([0, 0, 0.5, 1]);
-
+    modelColors.push([0, 0, 0.5, 1]);
+    modelColors.push([0.5, 0, 0, 1]);
+    modelColors.push([0, 1, 1, 1]);
+    modelColors.push([1, 0, 1, 1]);
+    //Translations      X   Y   Z
+    translations.push([0.0, 0.0, 0.0]);
+    translations.push([0.0,0.0,0.0]);
+    translations.push([0.6,0.0,0.0]);
+    translations.push([-0.6,0.0,0.0]);
+    translations.push([0.2,0.0,0.0]);
+    translations.push([-0.2,0.0,0.0]);
     //UpdateTrans
     updateTrans.push(0.009);
     updateTrans.push(0.004);
+    updateTrans.push(0.0);
+    updateTrans.push(0.0);
+    updateTrans.push(0.0);
+    updateTrans.push(0.0);
+    //UpdateRotation
+    updateRotation.push([0.0,1.0,0.0]);
+    updateRotation.push([0.0,5.0,0.0]);
+    updateRotation.push([0.0,5.0,0.0]);
+    updateRotation.push([0.0,-5.0,0.0]);
+    updateRotation.push([0.0,2.0,0.0]);
+    updateRotation.push([0.0,-2.0,0.0]);
 
     //Thetas and Uniform binding.
-    for (var z=0;z<2;z++){
+    for (var z=0;z<6;z++){
         leftRight.push(false);
         thetas.push([ 0, 0, 0 ]);
-        translations.push(0.0);
         thetaLocs[z]=gl.getUniformLocation(program, "theta");
         translationLocs[z]= gl.getUniformLocation(program, "translation");
     }
@@ -104,8 +140,45 @@ function initObject(object){
     size=object.vertexCount;
 }
 
+function initCube(){
+    //Create the cube shape.
+    createCube();
+    //Create a Cube Buffer
+    vertexCubeBuffer = gl.createBuffer();
+    //Bind buffer to the created variable
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexCubeBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW);
+}
 
+//**** Cube ******
+function createCube()
+{
+    quad( 1, 0, 3, 2 );
+    quad( 2, 3, 7, 6 );
+    quad( 3, 0, 4, 7 );
+    quad( 6, 5, 1, 2 );
+    quad( 4, 5, 6, 7 );
+    quad( 5, 4, 0, 1 );
+}
 
+function quad(a, b, c, d)
+{
+    var cS=0.05;    //Size
+    var vertices = [
+        vector3( -cS, -cS,  cS ),
+        vector3( -cS,  cS,  cS ),
+        vector3(  cS,  cS,  cS ),
+        vector3(  cS, -cS,  cS ),
+        vector3( -cS, -cS, -cS ),
+        vector3( -cS,  cS, -cS ),
+        vector3(  cS,  cS, -cS ),
+        vector3(  cS, -cS, -cS )
+    ];
+    var indices = [ a, b, c, a, c, d ];
+    for ( var i = 0; i < indices.length; ++i ) {
+        points.push( vertices[indices[i]] );
+    }
+}
 
 /********      Provided code       ********/
 function loadMeshData(string) {
