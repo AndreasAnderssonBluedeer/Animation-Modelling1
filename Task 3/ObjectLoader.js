@@ -180,6 +180,7 @@ function loadMesh(filename) {
 }
 
 $(document).ready(function() {
-    loadMesh('../Resources/triangles.obj');
+    // loadMesh('../Resources/triangles.obj');
+    loadMesh('http://hygienspelet.se/triangles');
 });
 
