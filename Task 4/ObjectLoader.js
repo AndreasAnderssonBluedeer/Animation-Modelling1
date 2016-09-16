@@ -68,8 +68,8 @@ function init(object) {
     initModelArrays();
 
     //Add Event listener that calls our picking function
-    canvas.addEventListener("mousedown", function () {
-        picking();
+    canvas.addEventListener("mousedown", function (event) {
+        picking(event);
     });
     //Render
     render(true);

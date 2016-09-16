@@ -52,7 +52,7 @@ $(document).keydown(function(event){
 });
 
 //Picking Function
-function picking(){
+function picking(event){
 
     $( "#Translate").text("Picking Function called.");
     if (gl.checkFramebufferStatus(gl.FRAMEBUFFER) != gl.FRAMEBUFFER_COMPLETE) {
