@@ -1,5 +1,7 @@
 /**
- * Created by Andreas on 9/09/2016.
+ * Authors:
+ * Andreas Andersson n9795383
+ * Li-Fu Hsu n9380418
  */
 function render(booli) {
     loop=booli;

@@ -14,8 +14,11 @@ var colorsArray = [];
 var framebuffer;
 
 var flag = true;
+var shininess;
+
 
 var color = new Uint8Array(4);
+var lightPosition=[0,0,-1,0];
 
 var vertices = [
         vec4( -0.5, -0.5,  0.5, 1.0 ),
@@ -33,7 +36,7 @@ var vertexColors = [
         vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
         vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
         vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
-        vec4( 0.1, 0.1, 0.2, 0.5 ),  // blue
+        vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
         vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
         vec4( 0.0, 1.0, 1.0, 1.0 ),  // cyan
         vec4( 1.0, 1.0, 1.0, 1.0 ),  // white
@@ -148,6 +151,9 @@ window.onload = function init() {
     gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(normalsArray), gl.STATIC_DRAW );
 
+    var vNormals = gl.getAttribLocation(program, "vNormal");
+    gl.vertexAttribPointer(vNormals, 3, gl.FLOAT, false, 0, 0);
+    gl.enableVertexAttribArray(vNormals);
     //?
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
@@ -159,6 +165,12 @@ window.onload = function init() {
     gl.enableVertexAttribArray(vPosition);
 
     thetaLoc = gl.getUniformLocation(program, "theta");
+
+
+
+    gl.uniform1f(gl.getUniformLocation(program, "shininess"),10);
+    gl.uniform4fv(gl.getUniformLocation(program, "lightPosition"), flatten(lightPosition));
+
     
     viewerPos = vec3(0.0, 0.0, -20.0 ); //?
 
@@ -227,6 +239,7 @@ var render = function(){
     
     gl.uniformMatrix4fv( gl.getUniformLocation(program,
             "modelViewMatrix"), false, flatten(modelView) );
+
 
     gl.uniform1i(gl.getUniformLocation(program, "i"),0);
     gl.drawArrays( gl.TRIANGLES, 0, 36 );

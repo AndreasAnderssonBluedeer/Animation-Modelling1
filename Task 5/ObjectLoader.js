@@ -1,3 +1,8 @@
+/**
+ * Authors:
+ * Andreas Andersson n9795383
+ * Li-Fu Hsu n9380418
+ */
 var gl;
 var size;
 var program;
