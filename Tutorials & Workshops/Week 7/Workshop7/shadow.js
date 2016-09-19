@@ -10,6 +10,7 @@ var far = 4;
 
 var theta  = 0.0;
 
+//Changes the perspective
 var left = -2.0;
 var right = 2.0;
 var ytop = 2.0;

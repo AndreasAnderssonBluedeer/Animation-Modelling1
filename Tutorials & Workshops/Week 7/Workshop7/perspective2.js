@@ -7,8 +7,9 @@ var NumVertices  = 36;
 
 var pointsArray = [];
 var colorsArray = [];
-var fColor;
-var black;
+
+
+
 
 var vertices = [
     vec4(-0.5, -0.5,  1.5, 1.0),
@@ -33,7 +34,7 @@ var vertexColors = [
 ];
 
 
-var near = 0.3;
+var near = 1.0;
 var far = 3.0;
 var radius = 4.0;
 var theta  = 0.0;
@@ -66,7 +67,26 @@ function quad(a, b, c, d) {
      pointsArray.push(vertices[c]); 
      colorsArray.push(vertexColors[a]); 
      pointsArray.push(vertices[d]); 
-     colorsArray.push(vertexColors[a]);  
+     colorsArray.push(vertexColors[a]);
+
+
+}
+
+function quadS(a, b, c, d) {
+    pointsArray.push(vertices[a]);
+    colorsArray.push(vertexColors[0]);
+    pointsArray.push(vertices[b]);
+    colorsArray.push(vertexColors[0]);
+    pointsArray.push(vertices[c]);
+    colorsArray.push(vertexColors[0]);
+    pointsArray.push(vertices[a]);
+    colorsArray.push(vertexColors[0]);
+    pointsArray.push(vertices[c]);
+    colorsArray.push(vertexColors[0]);
+    pointsArray.push(vertices[d]);
+    colorsArray.push(vertexColors[0]);
+
+
 }
 
 function colorCube()
@@ -77,6 +97,14 @@ function colorCube()
     quad( 6, 5, 1, 2 );
     quad( 4, 5, 6, 7 );
     quad( 5, 4, 0, 1 );
+
+    quadS( 1, 0, 3, 2 );
+    quadS( 2, 3, 7, 6 );
+    quadS( 3, 0, 4, 7 );
+    quadS( 6, 5, 1, 2 );
+    quadS( 4, 5, 6, 7 );
+    quadS( 5, 4, 0, 1 );
+
 }
 
 
@@ -94,12 +122,12 @@ window.onload = function init() {
     
     gl.enable(gl.DEPTH_TEST);
 
-    light = vec3(0.0, 2.0, 0.0);
+    light = vec3(0.0, -2.0  , 0.0);
 
 // matrix for shadow projection
     m = mat4();
     m[3][3] = 0;
-    m[3][1] = -1/light[1];
+    m[3][1] = -1.5/light[1];
     
     //
     //  Load shaders and initialize attribute buffers
@@ -108,17 +136,15 @@ window.onload = function init() {
     gl.useProgram( program );
     
     colorCube();
-
-    black = vec4(0.0, 0.0, 0.0, 1.0);
-
+    //Create/ bind buffer
     var cBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
     gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
-    
+    //Tell it where to draw the information
     var vColor = gl.getAttribLocation( program, "vColor" );
     gl.vertexAttribPointer( vColor, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vColor);
-
+    //Repeats commented steps above.
     var vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
     gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW );
@@ -126,8 +152,6 @@ window.onload = function init() {
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
-
-    fColor = gl.getUniformLocation(program, "fColor");
     
     modelViewMatrixLoc = gl.getUniformLocation( program, "modelViewMatrix" );
     projectionMatrixLoc = gl.getUniformLocation( program, "projectionMatrix" );
@@ -180,19 +204,17 @@ var render = function(){
 
     // model-view matrix for shadow then render
 
-    modelViewMatrix = mult(modelViewMatrix, translate(light[0], light[1], light[2]));
-    //SHADOW MATRIX
-    modelViewMatrix = mult(modelViewMatrix, m);
-    modelViewMatrix = mult(modelViewMatrix, translate(-light[0], -light[1],
-        -light[2]));
+        modelViewMatrix = mult(modelViewMatrix, translate(light[0], light[1], light[2]));
+        //SHADOW MATRIX
+        modelViewMatrix = mult(modelViewMatrix, m);
+        modelViewMatrix = mult(modelViewMatrix, translate(-light[0], -light[1],
+            -light[2]));
 
-   
     // send color and matrix for shadow
 
     gl.uniformMatrix4fv( modelViewMatrixLoc, false, flatten(modelViewMatrix) );
-    gl.uniformMatrix4fv( projectionMatrixLoc, false, flatten(projectionMatrix) );
-    gl.uniform4fv(fColor, flatten(black));
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, NumVertices);
+    gl.drawArrays(gl.TRIANGLES, NumVertices, NumVertices);
+
 
     requestAnimFrame(render);
 }
