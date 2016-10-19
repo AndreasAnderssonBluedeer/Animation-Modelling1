@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<!--
+ Authors:
+ Andreas Andersson n9795383
+ Li-Fu Hsu n9380418-->
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flying Loader</title>
+
+    <script type="x-shader/x-vertex" id="vertex-shader">
+    attribute vec3 pos;
+    uniform vec3 theta;
+    uniform vec3 translation;
+
+    void main() {
+
+   vec3 angles = radians( theta );
+    vec3 c = cos( angles );
+    vec3 s = sin( angles );
+
+    //Rotation Matrix for X.
+             mat4 rotateX = mat4(
+            1.0,  0.0,  0.0, 0.0,
+		    0.0,  c.x,  s.x, 0.0,
+		    0.0, -s.x,  c.x, 0.0,
+		    0.0,  0.0,  0.0, 1.0 );
+
+    //Rotation Matrix for Y.
+		    mat4 rotateY = mat4(
+		    c.y, 0.0, -s.y, 0.0,
+		    0.0, 1.0,  0.0, 0.0,
+		    s.y, 0.0,  c.y, 0.0,
+		    0.0, 0.0,  0.0, 1.0 );
+
+    //Rotation Matrix for Z.
+		    mat4 rotateZ = mat4(
+		    c.z, -s.z, 0.0, 0.0,
+		    s.z,  c.z, 0.0, 0.0,
+		    0.0,  0.0, 1.0, 0.0,
+		    0.0,  0.0, 0.0, 1.0 );
+
+    //Translation matrix
+     mat4 translationMatrix = mat4(
+            1.0,  0.0, 0.0, translation[0],
+		    0.0,  1.0, 0.0, translation[1],
+		    0.0,  0.0, 1.0, translation[2],
+		    0.0,  0.0, 0.0, 1.0 );
+
+      // Multiplication order-> Rotate, Position, Translation
+      gl_Position =  rotateX * rotateY * rotateZ * vec4(pos, 2.0) * translationMatrix;
+      //1.5 = zoom value, gl_position= position
+    }
+    </script>
+    <script type="x-shader/x-fragment" id="fragment-shader">
+    void main() {
+      gl_FragColor = vec4(0.5,0.0,0.0, 1.0);    //Drawing color
+    }
+    </script>
+    <script type="text/javascript" src="../Common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../Common/jquery-2.1.4.js"></script>
+    <script type="text/javascript" src="../Common/gl-matrix.js"></script>
+    <script type="text/javascript" src="../Common/InitShaders.js"></script>
+
+    <script type="text/javascript" src="Flying_Task1.js"></script>
+</head>
+<body>
+<canvas id="canvas" height="500" width="500"></canvas>
+
+</body>
+</html>
