@@ -37,7 +37,7 @@ function vec2()
     return result.splice( 0, 2 );
 }
 
-function vector3()
+function vec3()
 {
     var result = _argumentsToArray( arguments );
 
@@ -107,16 +107,16 @@ function mat3()
         v[0] = 1;
     case 1:
         m = [
-            vector3( v[0],  0.0,  0.0 ),
-            vector3(  0.0, v[0],  0.0 ),
-            vector3(  0.0,  0.0, v[0] )
+            vec3( v[0],  0.0,  0.0 ),
+            vec3(  0.0, v[0],  0.0 ),
+            vec3(  0.0,  0.0, v[0] )
         ];
         break;
 
     default:
-        m.push( vector3(v) );  v.splice( 0, 3 );
-        m.push( vector3(v) );  v.splice( 0, 3 );
-        m.push( vector3(v) );
+        m.push( vec3(v) );  v.splice( 0, 3 );
+        m.push( vec3(v) );  v.splice( 0, 3 );
+        m.push( vec3(v) );
         break;
     }
 
@@ -655,7 +655,7 @@ function flatten( v )
 
 var sizeof = {
     'vec2' : new Float32Array( flatten(vec2()) ).byteLength,
-    'vec3' : new Float32Array( flatten(vector3()) ).byteLength,
+    'vec3' : new Float32Array( flatten(vec3()) ).byteLength,
     'vec4' : new Float32Array( flatten(vec4()) ).byteLength,
     'mat2' : new Float32Array( flatten(mat2()) ).byteLength,
     'mat3' : new Float32Array( flatten(mat3()) ).byteLength,

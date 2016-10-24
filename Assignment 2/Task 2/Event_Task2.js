@@ -2,23 +2,32 @@
  * Created by Andreas on 18/10/2016.
  */
 $(document).keydown(function(event){
-        //Go Left
+    //Rotate Left
+    if(!fall) {
         if ("A" == String.fromCharCode(event.which)) {
-            if (transX > -0.8) {
-                transX -= 0.04;
-            }
+            theta[belly] -= 10;
+            console.log("rotation:" + theta[belly]);
 
         }
-        //Go Up/Forward
+        //Go Forward /Speed Up
         if ("S" == String.fromCharCode(event.which)) {
-            if (transY < 0.8) {
-                transY += 0.04;
+            if(moveY<=-1){
+                rise=true;
             }
+            moveSpeed += 0.01;
         }
-        //Go Right
+        //Rotate Right
         if ("D" == String.fromCharCode(event.which)) {
-            if (transX < 0.8) {
-                transX += 0.04;
-            }
+            theta[belly] += 10;
+            console.log("rotation:" + theta[belly]);
         }
+        if (theta[belly] >= 360 || theta[belly] <= -360) {
+            theta[belly] = 0;
+            console.log("rotation:" + theta[belly]);
+        }
+
+        if("Z" == String.fromCharCode(event.which)) {
+            fall=true;
+        }
+    }
 });

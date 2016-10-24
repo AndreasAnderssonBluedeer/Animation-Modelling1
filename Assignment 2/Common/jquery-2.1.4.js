@@ -6288,7 +6288,7 @@ var
 				// Trust units reported by jQuery.css
 				unit = unit || start[ 3 ];
 
-				// Make sure we update the tween properties later on
+				// Make sure we wingUpdateRot the tween properties later on
 				parts = parts || [];
 
 				// Iteratively approximate from a nonzero starting point
@@ -7409,7 +7409,7 @@ jQuery.extend({
 				for ( ; i < max; i++ ) {
 					option = options[ i ];
 
-					// IE6-9 doesn't update selected after form reset (#2551)
+					// IE6-9 doesn't wingUpdateRot selected after form reset (#2551)
 					if ( ( option.selected || i === index ) &&
 							// Don't return options that are disabled or in a disabled optgroup
 							( support.optDisabled ? !option.disabled : option.getAttribute( "disabled" ) === null ) &&

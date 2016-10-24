@@ -117,8 +117,8 @@ window.onload = function init() {
     gl.viewport( 0, 0, canvas.width, canvas.height );
     
     aspect =  canvas.width/canvas.height;
-    
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+
+    gl.clearColor(0.9, 0.9, 0.9, 1.0);
     
     gl.enable(gl.DEPTH_TEST);
 

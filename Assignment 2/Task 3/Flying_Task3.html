@@ -9,48 +9,54 @@
     <title>Flying Loader</title>
 
     <script type="x-shader/x-vertex" id="vertex-shader">
-    attribute vec3 pos;
-    uniform vec3 theta;
-    uniform vec3 translation;
 
-    void main() {
 
-   vec3 angles = radians( theta );
-    vec3 c = cos( angles );
-    vec3 s = sin( angles );
+    //***
+    attribute vec3 aVertexPosition;
+attribute vec3 aVertexNormal;
 
-    //Rotation Matrix for X.
-             mat4 rotateX = mat4(
-            1.0,  0.0,  0.0, 0.0,
-		    0.0,  c.x,  s.x, 0.0,
-		    0.0, -s.x,  c.x, 0.0,
-		    0.0,  0.0,  0.0, 1.0 );
+uniform mat4 uMVMatrix;
+uniform mat4 uPMatrix;
+uniform mat4 uNMatrix;
 
-    //Rotation Matrix for Y.
-		    mat4 rotateY = mat4(
-		    c.y, 0.0, -s.y, 0.0,
-		    0.0, 1.0,  0.0, 0.0,
-		    s.y, 0.0,  c.y, 0.0,
-		    0.0, 0.0,  0.0, 1.0 );
+varying vec3 vNormal;
+varying vec3 vEyeVec;
 
-    //Rotation Matrix for Z.
-		    mat4 rotateZ = mat4(
-		    c.z, -s.z, 0.0, 0.0,
-		    s.z,  c.z, 0.0, 0.0,
-		    0.0,  0.0, 1.0, 0.0,
-		    0.0,  0.0, 0.0, 1.0 );
+void main(void) {
+     //Transformed vertex position
+     vec4 vertex = uMVMatrix * vec4(aVertexPosition, 1.0);
 
-    //Translation matrix
-     mat4 translationMatrix = mat4(
-            1.0,  0.0, 0.0, translation[0],
-		    0.0,  1.0, 0.0, translation[1],
-		    0.0,  0.0, 1.0, translation[2],
-		    0.0,  0.0, 0.0, 1.0 );
+     //Transformed normal position
+     vNormal = vec3(uNMatrix * vec4(aVertexNormal, 1.0));
 
-      // Multiplication order-> Rotate, Position, Translation
-      gl_Position =  rotateX * rotateY * rotateZ * vec4(pos, 2.0) * translationMatrix;
-      //1.5 = zoom value, gl_position= position
-    }
+     //Vector Eye
+     vEyeVec = -vec3(vertex.xyz);
+
+     //Final vertex position
+     gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+}
+
+
+    //**
+   attribute  vec4 pos;
+
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+
+void main()
+{
+
+
+   vec4 position = projectionMatrix * modelViewMatrix * pos;
+
+  // Adjust the z to divide by
+  float zToDivideBy = 1.0 + position.z * 1.0;
+
+  // Divide x and y by z.
+    gl_Position = vec4(position.xy / zToDivideBy, position.zw);
+
+}
+
     </script>
     <script type="x-shader/x-fragment" id="fragment-shader">
     void main() {
@@ -61,8 +67,10 @@
     <script type="text/javascript" src="../Common/jquery-2.1.4.js"></script>
     <script type="text/javascript" src="../Common/gl-matrix.js"></script>
     <script type="text/javascript" src="../Common/InitShaders.js"></script>
+    <script type="text/javascript" src="../Common/MV.js"></script>
 
-    <script type="text/javascript" src="Flying_Task3.js"></script>
+    <script type="text/javascript" src="Program_Task3.js"></script>
+    <script type="text/javascript" src="Model_Task3.js"></script>
     <script type="text/javascript" src="Event_Task3.js"></script>
 </head>
 <body>

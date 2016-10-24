@@ -202,11 +202,12 @@ function torso() {
 }
 
 function head() {
-   
+   //= objectbuffer?
     instanceMatrix = mult(modelViewMatrix, translate(0.0, 0.5 * headHeight, 0.0 ));
 	instanceMatrix = mult(instanceMatrix, scale4(headWidth, headHeight, headWidth) );
+    //then use buffer in shader. 
     gl.uniformMatrix4fv(modelViewMatrixLoc, false, flatten(instanceMatrix));
-    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4);
+    for(var i =0; i<6; i++) gl.drawArrays(gl.TRIANGLE_FAN, 4*i, 4); //change
 }
 
 function leftUpperArm() {
@@ -293,7 +294,7 @@ function cube()
 }
 
 
-window.onload = function init() {
+function init(object) {
 
     canvas = document.getElementById( "gl-canvas" );
     
@@ -316,20 +317,22 @@ window.onload = function init() {
     modelViewMatrix = mat4();
 
         
-    gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
-    gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
-    
-    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix")
+
     
     cube();
         
     vBuffer = gl.createBuffer();
         
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData(gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
+    gl.bufferData(gl.ARRAY_BUFFER, flatten(object.vertices), gl.STATIC_DRAW);
+    gl.uniformMatrix4fv(gl.getUniformLocation( program, "modelViewMatrix"), false, flatten(modelViewMatrix) );
+    gl.uniformMatrix4fv( gl.getUniformLocation( program, "projectionMatrix"), false, flatten(projectionMatrix) );
+
+    modelViewMatrixLoc = gl.getUniformLocation(program, "modelViewMatrix");
     
     var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
+    gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, gl.FALSE,
+        Float32Array.BYTES_PER_ELEMENT * 6, 0);
     gl.enableVertexAttribArray( vPosition );
     
         document.getElementById("slider0").onchange = function() {
@@ -394,39 +397,111 @@ var render = function() {
         theta[torsoId]+=3;
         initNodes(torsoId);
 
-        theta[leftUpperArmId]+=3;
-        initNodes(leftUpperArmId);
+        // theta[leftUpperArmId]+=3;
+        // initNodes(leftUpperArmId);
 
 
 
-        if(theta[leftLowerLegId]<40 && walk){
-            theta[leftLowerLegId]+=1;
-            theta[leftUpperLegId]+=1;
-            theta[rightLowerLegId]+=1;
-            theta[rightUpperLegId]-=1;
-        }
-            else if(walk){
-            walk=false;
-        }
+    //     if(theta[leftLowerLegId]<40 && walk){
+    //         theta[leftLowerLegId]+=1;
+    //         theta[leftUpperLegId]+=1;
+    //         theta[rightLowerLegId]+=1;
+    //         theta[rightUpperLegId]-=1;
+    //     }
+    //         else if(walk){
+    //         walk=false;
+    //     }
+    //
+    // if(theta[leftLowerLegId]>-0 && !walk){
+    //     theta[leftLowerLegId]-=1;
+    //     theta[leftUpperLegId]-=1;
+    //     theta[rightLowerLegId]-=1;
+    //     theta[rightUpperLegId]+=1;
+    //   }
+    //   else if(!walk){
+    //     walk=true;
+    //  }
 
-    if(theta[leftLowerLegId]>-0 && !walk){
-        theta[leftLowerLegId]-=1;
-        theta[leftUpperLegId]-=1;
-        theta[rightLowerLegId]-=1;
-        theta[rightUpperLegId]+=1;
-      }
-      else if(!walk){
-        walk=true;
-     }
+        // initNodes(leftLowerLegId);
+        // initNodes(rightLowerLegId);
+        // initNodes(leftUpperLegId);
+        // initNodes(rightUpperLegId);
 
-        initNodes(leftLowerLegId);
-        initNodes(rightLowerLegId);
-        initNodes(leftUpperLegId);
-        initNodes(rightUpperLegId);
-
-        theta[leftLowerArmId]-=1;
-        initNodes(leftLowerArmId);
+        // theta[leftLowerArmId]-=1;
+        // initNodes(leftLowerArmId);
         gl.clear( gl.COLOR_BUFFER_BIT );
         traverse(torsoId);
         requestAnimFrame(render);
 }
+
+
+function loadMeshData(string) {
+    var lines = string.split("\n");
+    var positions = [];
+    var normals = [];
+    var vertices = [];
+
+    for ( var i = 0 ; i < lines.length ; i++ ) {
+        var parts = lines[i].trimRight().split(' ');
+        if ( parts.length > 0 ) {
+            switch(parts[0]) {
+                case 'v':  positions.push(
+                    vec3.fromValues(
+                        parseFloat(parts[1]),
+                        parseFloat(parts[2]),
+                        parseFloat(parts[3])
+                    ));
+                    break;
+                case 'vn':
+                    normals.push(
+                        vec3.fromValues(
+                            parseFloat(parts[1]),
+                            parseFloat(parts[2]),
+                            parseFloat(parts[3])));
+                    break;
+                case 'f': {
+                    var f1 = parts[1].split('/');
+                    var f2 = parts[2].split('/');
+                    var f3 = parts[3].split('/');
+                    Array.prototype.push.apply(
+                        vertices, positions[parseInt(f1[0]) - 1]);
+                    Array.prototype.push.apply(
+                        vertices, normals[parseInt(f1[2]) - 1]);
+                    Array.prototype.push.apply(
+                        vertices, positions[parseInt(f2[0]) - 1]);
+                    Array.prototype.push.apply(
+                        vertices, normals[parseInt(f2[2]) - 1]);
+                    Array.prototype.push.apply(
+                        vertices, positions[parseInt(f3[0]) - 1]);
+                    Array.prototype.push.apply(
+                        vertices, normals[parseInt(f3[2]) - 1]);
+                    break;
+                }
+            }
+        }
+    }
+    console.log("Loaded mesh with " + (vertices.length / 6) + " vertices");
+
+    return {
+        primitiveType: 'TRIANGLES',
+        vertices: new Float32Array(vertices),
+        vertexCount: vertices.length / 6,
+        material: {ambient: 0.2, diffuse: 0.5, shininess: 10.0}
+    };
+}
+
+function loadMesh(filename) {
+    $.ajax({
+        url: filename,
+        dataType: 'text'
+    }).done(function(data) {
+        init(loadMeshData(data));
+    }).fail(function() {
+        alert('Failed to retrieve [' + filename + "]");
+    });
+}
+
+$(document).ready(function() {
+    loadMesh('common/triangles.obj');
+    // loadMesh('http://hygienspelet.se/triangles');
+});
